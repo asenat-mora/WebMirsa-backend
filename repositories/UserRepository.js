@@ -1,11 +1,11 @@
-const {PrismaClient} = require('@prisma/client')
-
-const prisma = new PrismaClient();
+const pool = require('../db/connection');
 
 const createUser = async(user) => {
-    return await prisma.user.create(user);
+    var query = await pool.query('INSERT INTO user SET ?', user);
+    return query;
 }
 
+/*
 const findUserById = async(id) => {
     return await prisma.user.findUnique({
         where: {id}, 
@@ -47,11 +47,12 @@ const updateUser = async(id, user) => {
 const deleteUser = async(id) => {
     return await prisma.user.delete({where: {id}});
 }
-
+*/
 module.exports = {
-    createUser,
+    createUser
+    /*
     findUserById,
     findAllUsers,
     updateUser,
-    deleteUser
+    deleteUser*/
 }
