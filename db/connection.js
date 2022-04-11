@@ -3,7 +3,7 @@ const {promisify} = require('util');
 require('dotenv').config();
 
 const conDetails = {
-    host: process.env.DB_HOST ,
+    host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -28,6 +28,7 @@ pool.getConnection((err, connection) => {
         return;
 });
 
+pool.getConnection = promisify(pool.getConnection);
 pool.query = promisify(pool.query);
 
 module.exports = pool;
