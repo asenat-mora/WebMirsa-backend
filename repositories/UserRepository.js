@@ -35,7 +35,7 @@ const updateUser = async(id,user) => {
     var connection = await pool.getConnection();
     try{
         var query = await pool.query('SELECT * FROM user WHERE id = ?', id);
-        if(query[0].length === 0){
+        if(query.length === 0){
             connection.release();
             return "User with id = "+ id +" does not exist";
         }
@@ -54,7 +54,7 @@ const updateUser = async(id,user) => {
 
 const getUserById = async(id) => {
     const user = await pool.query('SELECT id,name,surname,email,verificationEmail FROM user WHERE id = ?', id);
-    if(user[0].length === 0){
+    if(user.length === 0){
         return "User with id = "+ id +" does not exist";
     }
     return user[0];
@@ -62,7 +62,17 @@ const getUserById = async(id) => {
 
 const getUserByEmail = async(email) => {
     const user = await pool.query('SELECT * FROM user WHERE email = ?', email);
-    return user[0];
+    if(user.length === 0){
+        return;
+    }else{
+        const rolesQuery = await pool.query('SELECT roleId FROM userRoles WHERE userId = ?', user[0].id);
+        user[0].roles = [];
+        rolesQuery.map(role => {
+            user[0].roles.push(role.roleId);
+        });
+        return user[0];
+    }
+    
 };
 
 /*
