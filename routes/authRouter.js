@@ -54,7 +54,7 @@ router.post("/login", validationMiddleware(loginSchema, "body"), async (req, res
     const user = await userRepository.getUserByEmail(email);
     
     if(!user){
-        res.status(400).json({
+        res.status(404).json({
             message: "User with email "+ email +" not found"
         });
     }else{
