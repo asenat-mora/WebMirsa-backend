@@ -21,7 +21,7 @@ const loginSchema = Joi.object({
     password: Joi.string().required(),
 });
 
-
+/* end-point registro */
 router.post("/signUp", validationMiddleware(signUpSchema, "body"), async (req, res) => {
 	const { name, surname, email, password, verificationEmail, roles } = req.body;
     
@@ -47,7 +47,7 @@ router.post("/signUp", validationMiddleware(signUpSchema, "body"), async (req, r
         }	
 	
 });
-
+/* end-point login */
 router.post("/login", validationMiddleware(loginSchema, "body"), async (req, res) => {
     const { email, password } = req.body;
 
@@ -75,7 +75,7 @@ router.post("/login", validationMiddleware(loginSchema, "body"), async (req, res
         }
     }
 });
-
+/* end-point cerrar sesion */
 router.post("/logout", async (req, res) => {
     const { refreshToken } = req.body;
     await refreshTokenRepository.deleteRefreshToken(refreshToken);

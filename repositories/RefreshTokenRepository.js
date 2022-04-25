@@ -1,5 +1,5 @@
 const pool = require('../db/connection');
-
+/* insertar token de refresco */
 const insertRefreshToken = async(refreshToken, userId, expiresIn) => {
     try{
         await pool.query('INSERT INTO refreshToken SET ?', {
@@ -11,7 +11,7 @@ const insertRefreshToken = async(refreshToken, userId, expiresIn) => {
         console.log(err)
     }
 }
-
+/* eliminar token de refresco */
 const deleteRefreshToken = async(refreshToken) => {
     try{
         await pool.query('DELETE FROM refreshToken WHERE token = ?', refreshToken);

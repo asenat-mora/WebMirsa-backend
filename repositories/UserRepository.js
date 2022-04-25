@@ -1,5 +1,6 @@
 const pool = require('../db/connection');
 
+/* crear usuario */
 const createUser = async(user, roles) => {
     
     var connection = await pool.getConnection();
@@ -30,7 +31,7 @@ const createUser = async(user, roles) => {
     
 }
 
-
+/* actualizar usuario */
 const updateUser = async(id,user) => {
     var connection = await pool.getConnection();
     try{
@@ -51,7 +52,7 @@ const updateUser = async(id,user) => {
     console.log(err)
     }
 }
-
+/* Obtener un usuario por ID */
 const getUserById = async(id) => {
     const user = await pool.query('SELECT id,name,surname,email,verificationEmail FROM user WHERE id = ?', id);
     if(user.length === 0){
@@ -59,7 +60,7 @@ const getUserById = async(id) => {
     }
     return user[0];
 };
-
+/* Obtener un usuario por email */
 const getUserByEmail = async(email) => {
     const user = await pool.query('SELECT * FROM user WHERE email = ?', email);
     if(user.length === 0){
