@@ -41,3 +41,19 @@ CREATE TABLE `RefreshToken` (
     PRIMARY KEY (`id`),
     CONSTRAINT `RefreshToken_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+CREATE TABLE `Item` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `description` VARCHAR(191) NOT NULL,
+    `price` INTEGER NOT NULL,
+    `image` VARCHAR(191) NOT NULL,
+    `color` VARCHAR(20) NOT NULL,
+    `model` VARCHAR(191) NOT NULL,
+    `id_last_user` INTEGER NOT NULL,
+    `last_modification_description` VARCHAR(191) NOT NULL,
+    `last_modification_date` DATETIME NOT NULL,
+
+    PRIMARY KEY (`id`),
+    CONSTRAINT `Item_id_last_user_fkey` FOREIGN KEY (`id_last_user`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+);
