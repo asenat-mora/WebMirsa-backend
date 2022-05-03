@@ -10,7 +10,7 @@ const updateSchema = Joi.object({
     email: Joi.string().email().required(),
     verificationEmail: Joi.string().email().required(),
 });
-
+/* end-point actualizar los datos de un usuario */
 router.put("/:id", validationMiddleware(updateSchema, "body"), async (req, res) => {
     const { id } = req.params;
     const { name, surname, email, verificationEmail } = req.body;
