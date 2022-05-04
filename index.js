@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 var helmet = require('helmet');
 const authRouter = require('./routes/authRouter');
+const itemRouter = require('./routes/itemRouter');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -15,6 +16,7 @@ app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/auth', authRouter);
+app.use('/api/item', itemRouter);
 
 const port = process.env.PORT || 3000;
 

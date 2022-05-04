@@ -9,7 +9,7 @@ const addDetailsItem = (item, userId, description) => {
     }
 }
 
-const createItem = async(item, userId) => {
+const createItem = async(item, userId, colors) => {
     var connection = await pool.getConnection();
 
     item = addDetailsItem(item, userId, "CREATED");
@@ -17,6 +17,12 @@ const createItem = async(item, userId) => {
     try{
         await connection.promise().beginTransaction();
         const itemQuery = await connection.promise().query('INSERT INTO item SET ?', item);
+        colors.forEach(color => {
+            connection.promise().query('INSERT INTO ItemColor SET ?', {
+                item_Id: itemQuery[0].insertId,
+                color_Id: color
+            });
+        });
 
         connection.promise().commit()
         connection.release();
@@ -44,7 +50,7 @@ const updateItem = async(id, item, userId) => {
             return "Item with id = "+ id +" does not exist";
         }
         await connection.promise().query('UPDATE item SET ? WHERE id = ?', [item, id]);
-        query = await pool.query('SELECT id,name,description,price,image,color, model FROM item WHERE id = ?', id);
+        query = await pool.query('SELECT id,name,description,price,image,side,model,code FROM item WHERE id = ? AND isDeleted = FALSE', id);
         connection.release();
         return query[0];
     }catch(err){
@@ -59,7 +65,7 @@ const updateItem = async(id, item, userId) => {
 }
 
 const getItemById = async(id) => {
-    const item = await pool.query('SELECT id,name,description,price,image,color, model  FROM item WHERE id = ?', id);
+    const item = await pool.query('SELECT id,name,description,price,image,side,model,code FROM item WHERE id = ? AND isDeleted = FALSE', id);
     if(item.length === 0){
         return "Item with id = "+ id +" does not exist";
     }
@@ -67,19 +73,23 @@ const getItemById = async(id) => {
 }
 
 const getAllItems = async() => {
-    const items = await pool.query('SELECT id,name,description,price,image,color, model  FROM item');
+    const items = await pool.query('SELECT id,name,description,price,image,side,model,code FROM item WHERE isDeleted = FALSE');
     return items;
 }
 
-const deleteItem = async(id) => {
+const deleteItem = async(id, userId) => {
     var connection = await pool.getConnection();
+    item = addDetailsItem({
+        isDeleted: true
+    }, userId, "DELETED");
     try{
-        var query = await pool.query('SELECT * FROM item WHERE id = ?', id);
+
+        var query = await pool.query('SELECT * FROM item WHERE id = ? and isDeleted = FALSE', id);
         if(query.length === 0){
             connection.release();
             return "Item with id = "+ id +" does not exist";
         }
-        await connection.promise().query('DELETE FROM item WHERE id = ?', id);
+        await connection.promise().query('UPDATE item SET ? WHERE id = ?', [item, id]);
         connection.release();
     }catch(err){
         connection.release();

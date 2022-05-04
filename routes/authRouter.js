@@ -7,6 +7,7 @@ const jwtService = require("../services/jwtService");
 const refreshTokenRepository = require("../repositories/RefreshTokenRepository");
 const validationMiddleware = require("../middlewares/validationMiddleware");
 
+
 const signUpSchema = Joi.object({
 	name: Joi.string().required(),
 	surname: Joi.string().required(),
