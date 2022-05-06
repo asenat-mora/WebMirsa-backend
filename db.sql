@@ -55,11 +55,13 @@ CREATE TABLE `Item` (
     `model` VARCHAR(191) NOT NULL,
     `side` VARCHAR(191) NOT NULL,
     `id_last_user` INTEGER NOT NULL,
+    `autoPartId` INTEGER NOT NULL,
     `last_modification_description` VARCHAR(191) NOT NULL,
     `last_modification_date` DATETIME NOT NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (`id`),
-    CONSTRAINT `Item_id_last_user_fkey` FOREIGN KEY (`id_last_user`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT `Item_id_last_user_fkey` FOREIGN KEY (`id_last_user`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT `Item_autoPartId_fkey` FOREIGN KEY (`autoPartId`) REFERENCES `AutoPart`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE `Color`(
@@ -83,10 +85,9 @@ insert into Color (name) values ('Transparente');
 
 
 CREATE TABLE `ItemColor`(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `item_id` INTEGER NOT NULL,
     `color_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`item_id`,`color_id`),
     CONSTRAINT `ItemColor_item_id_fkey` FOREIGN KEY (`item_id`) REFERENCES `Item`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT `ItemColor_color_id_fkey` FOREIGN KEY (`color_id`) REFERENCES `Color`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -101,6 +102,15 @@ CREATE TABLE `Brand`(
     PRIMARY KEY (`id`),
     CONSTRAINT `Brand_id_last_user_fkey` FOREIGN KEY (`id_last_user`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+CREATE TABLE `ItemBrand`(
+    `item_id` INTEGER NOT NULL,
+    `brand_id` INTEGER NOT NULL,
+    PRIMARY KEY (`item_id`, `brand_id`),
+    CONSTRAINT `ItemBrand_item_id_fkey` FOREIGN KEY (`item_id`) REFERENCES `Item`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT `ItemBrand_brand_id_fkey` FOREIGN KEY (`brand_id`) REFERENCES `Brand`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 
 CREATE TABLE `Autopart`(
     `id` INTEGER NOT NULL AUTO_INCREMENT,

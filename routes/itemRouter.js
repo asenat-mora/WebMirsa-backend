@@ -15,10 +15,12 @@ const itemSchema = Joi.object({
     colors: Joi.array().items(Joi.number()).required(),
     model: Joi.string().required(),
     side: Joi.string().required(),
+    brand: Joi.array().items(Joi.number()).required(),
+    autoPart: Joi.number().required(),
 });
 
 router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(itemSchema, "body"), async (req, res) => {
-    const { name, description, price, image, colors, model, code, side } = req.body;
+    const { name, description, price, image, colors, model, code, side, brand, autoPart } = req.body;
     const result = await itemRepository.createItem({
         name: name,
         description: description,
@@ -27,8 +29,9 @@ router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMidd
         image: image,
         //color: color,
         model: model,
-        side: side
-    }, req.user.userId, colors);
+        side: side,
+        autoPartId: autoPart,
+    }, req.user.userId, colors, brand, autoPart);
     if(typeof result === "string"){
         res.status(400).json({
             message: result
@@ -40,16 +43,17 @@ router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMidd
 });
 
 router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(itemSchema, "body"), async (req, res) => {
-    const { name, description, price, image, model ,code, side } = req.body;
+    const { name, description, price, image, model ,code, side ,autoPart } = req.body;
     const result = await itemRepository.updateItem(req.params.id, {
         name: name,
         description: description,
         price: price,
         image: image,
-        code: clave,
+        code: code,
         //color: color,
         model: model,
-        side: side
+        side: side,
+        autoPartId : autoPart
     }, req.user.userId);
 
     if(typeof result === "string"){
