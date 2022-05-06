@@ -1,50 +1,89 @@
 const router = require("express").Router();
 const Joi = require("joi");
-const { Prisma } = require("@prisma/client");
+const argon2 = require('argon2');
 
-const repository = require("../repositories/UserRepository");
+const userRepository = require("../repositories/UserRepository");
+const jwtService = require("../services/jwtService");
+const refreshTokenRepository = require("../repositories/RefreshTokenRepository");
 const validationMiddleware = require("../middlewares/validationMiddleware");
 
-const schema = Joi.object({
+
+const signUpSchema = Joi.object({
 	name: Joi.string().required(),
 	surname: Joi.string().required(),
 	email: Joi.string().email().required(),
 	password: Joi.string().required(),
 	verificationEmail: Joi.string().email().required(),
+    roles: Joi.array().items(Joi.number()).required(),
 });
 
-router.get("/", async (req, res) => {
-	//const  users = await repository.findAllUsers();
-	const users = await repository.findUserById(2);
-	if (!users) {
-		console.log(users);
-	}
-	res.json(users);
+const loginSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
 });
 
-router.post("/", validationMiddleware(schema, "body"), async (req, res) => {
-	const { name, surname, email, password, verificationEmail } = req.body;
-	try {
-		const user = await repository.createUser({
-			data: {
-				name,
-				surname,
-				email,
-				password,
-				verificationEmail,
+/* end-point registro */
+router.post("/signUp", validationMiddleware(signUpSchema, "body"), async (req, res) => {
+	const { name, surname, email, password, verificationEmail, roles } = req.body;
+    
+    const hashedPassword = await argon2.hash(password);
+
+    
+		const result = await userRepository.createUser(
+			{
+				name : name,
+				surname : surname,
+				email : email,
+				password: hashedPassword,
+				verificationEmail: verificationEmail,
 			},
-		});
-		res.json(user);
-	} catch (error) {
-		if (error instanceof Prisma.PrismaClientKnownRequestError) {
-			if (error.code === "P2002") {
-				res.status(400).json({ error: "Email already exists" });
-				console.log("already exists");
-			}
-		} else {
-			res.status(500).json({ error: "Internal server error" });
-		}
-	}
+            roles
+		);
+        if(typeof result === "string"){
+            res.status(400).json({
+                message: result
+            });
+        }else{
+            res.sendStatus(204);
+        }	
+	
 });
+/* end-point login */
+router.post("/login", validationMiddleware(loginSchema, "body"), async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await userRepository.getUserByEmail(email);
+    
+    if(!user){
+        res.status(404).json({
+            message: "User with email "+ email +" not found"
+        });
+    }else{
+        const {id , roles} = user;
+        const isValid = await argon2.verify(user.password, password);
+        if(!isValid){
+            res.status(400).json({
+                message: "Invalid password"
+            });
+        }else{
+            const jwttoken = await jwtService.generateJWTToken({userId: id, roles: roles});
+            const {token, expiresIn} = await jwtService.generateRefreshToken({id: id});
+            await refreshTokenRepository.insertRefreshToken(token, user.id , expiresIn);
+            res.status(200).json({
+                accessToken: jwttoken,
+                refreshToken: token,
+            });
+        }
+    }
+});
+/* end-point cerrar sesion */
+router.post("/logout", async (req, res) => {
+    const { refreshToken } = req.body;
+    await refreshTokenRepository.deleteRefreshToken(refreshToken);
+    res.sendStatus(204);
+});
+
+
+
 
 module.exports = router;
