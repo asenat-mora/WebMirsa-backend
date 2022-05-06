@@ -91,5 +91,25 @@ CREATE TABLE `ItemColor`(
     CONSTRAINT `ItemColor_color_id_fkey` FOREIGN KEY (`color_id`) REFERENCES `Color`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+CREATE TABLE `Brand`(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) UNIQUE NOT NULL,
+    `id_last_user` INTEGER NOT NULL,
+    `last_modification_description` VARCHAR(191) NOT NULL,
+    `last_modification_date` DATETIME NOT NULL,
+    `isDeleted` BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `Brand_id_last_user_fkey` FOREIGN KEY (`id_last_user`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+);
 
+CREATE TABLE `Autopart`(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) UNIQUE NOT NULL,
+    `id_last_user` INTEGER NOT NULL,
+    `last_modification_description` VARCHAR(191) NOT NULL,
+    `last_modification_date` DATETIME NOT NULL,
+    `isDeleted` BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `Autopart_id_last_user_fkey` FOREIGN KEY (`id_last_user`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+);
 

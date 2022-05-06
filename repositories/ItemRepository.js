@@ -78,7 +78,6 @@ const getAllItems = async() => {
 }
 
 const deleteItem = async(id, userId) => {
-    var connection = await pool.getConnection();
     item = addDetailsItem({
         isDeleted: true
     }, userId, "DELETED");
@@ -89,10 +88,8 @@ const deleteItem = async(id, userId) => {
             connection.release();
             return "Item with id = "+ id +" does not exist";
         }
-        await connection.promise().query('UPDATE item SET ? WHERE id = ?', [item, id]);
-        connection.release();
+        await pool.query('UPDATE item SET ? WHERE id = ?', [item, id]);
     }catch(err){
-        connection.release();
         console.log(err)
     }
 }
