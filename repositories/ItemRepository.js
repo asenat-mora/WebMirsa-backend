@@ -9,7 +9,7 @@ const addDetailsItem = (item, userId, description) => {
     }
 }
 
-const createItem = async (item, userId, colors, brands) => {
+const createItem = async (item, userId, colors) => {
 	var connection = await pool.getConnection();
 
 	item = addDetailsItem(item, userId, "CREATED");
@@ -26,13 +26,6 @@ const createItem = async (item, userId, colors, brands) => {
 			});
 		});
 
-		brands.forEach((brand) => {
-			connection.promise().query("INSERT INTO ItemBrand SET ?", {
-				item_Id: itemQuery[0].insertId,
-				brand_Id: brand,
-			});
-		});
-
 		connection.promise().commit();
 		connection.release();
 	} catch (err) {
@@ -41,8 +34,10 @@ const createItem = async (item, userId, colors, brands) => {
 		if (err.code === "ER_DUP_ENTRY") {
 			return "Product is already on the db";
 		} else if (err.code === "ER_NO_REFERENCED_ROW_2") {
-			return "User with id " + userId[i] + " does not exist";
+            console.log(err)
+			return "Error with a foreign key";
 		}
+        console.log(err)
 	}
 };
 
@@ -58,7 +53,7 @@ const updateItem = async(id, item, userId) => {
             return "Item with id = "+ id +" does not exist";
         }
         await connection.promise().query('UPDATE item SET ? WHERE id = ?', [item, id]);
-        query = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName FROM item I JOIN Autopart A on I.autoPartId = A.id WHERE id = ? AND isDeleted = FALSE', id);
+        query = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.id = ? AND I.isDeleted = FALSE', id);
         connection.release();
         return query[0];
     }catch(err){
@@ -66,14 +61,14 @@ const updateItem = async(id, item, userId) => {
         if(err.code === 'ER_DUP_ENTRY') {
             return "Product is already on the db";
         }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
-            return "User with id " + userId[i]+ " does not exist";
+            return "Error with a foreign key";
         }
         console.log(err)
     }
 }
 
 const getItemById = async(id) => {
-    var item = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName FROM item I JOIN Autopart A on I.autoPartId = A.id WHERE I.id = ? AND I.isDeleted = FALSE', id);
+    var item = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.id = ? AND I.isDeleted = FALSE', id);
     if(item.length === 0){
         return "Item with id = "+ id +" does not exist";
     }
@@ -84,22 +79,16 @@ const getItemById = async(id) => {
         colordId.push(color.id);
     });
 
-    const brands = await pool.query('SELECT B.id, B.name FROM brand B JOIN ItemBrand IB ON B.id = IB.brand_Id WHERE IB.item_Id = ?', id);
-    const brandId = []
-    brands.forEach((brand) => {
-        brandId.push(brand.id);
-    });
     item = {
         ...item,
         colors: colordId,
-        brands: brandId
     }
 
     return item;
 }
 
 const getAllItems = async() => {
-    const items = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName FROM item I JOIN Autopart A on I.autoPartId = A.id');
+    const items = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.isDeleted = FALSE');
     for (let i = 0; i < items.length; i++) {
         const colors = await pool.query('SELECT C.id FROM color C JOIN ItemColor IC ON C.id = IC.color_Id WHERE IC.item_Id = ?', items[i].id);
         const colordId = []
@@ -107,16 +96,9 @@ const getAllItems = async() => {
             colordId.push(color.id);
         });
 
-        const brands = await pool.query('SELECT B.id FROM brand B JOIN ItemBrand IB ON B.id = IB.brand_Id WHERE IB.item_Id = ?', items[i].id);
-        const brandId = []
-        brands.forEach((brand) => {
-            brandId.push(brand.id);
-        });
-
         items[i] = {
             ...items[i],
             colors: colordId,
-            brands: brandId
         }
     }
     return items;

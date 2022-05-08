@@ -15,7 +15,7 @@ const itemSchema = Joi.object({
     colors: Joi.array().items(Joi.number()).required(),
     model: Joi.string().required(),
     side: Joi.string().required(),
-    brand: Joi.array().items(Joi.number()).required(),
+    brand: Joi.number().required(),
     autoPart: Joi.number().required(),
 });
 
@@ -27,7 +27,7 @@ router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMidd
         code: code,
         price: price,
         image: image,
-        //color: color,
+        brandId: brand,
         model: model,
         side: side,
         autoPartId: autoPart,
@@ -43,14 +43,14 @@ router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMidd
 });
 
 router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(itemSchema, "body"), async (req, res) => {
-    const { name, description, price, image, model ,code, side ,autoPart } = req.body;
+    const { name, description, price, image, model ,code, side, brand ,autoPart } = req.body;
     const result = await itemRepository.updateItem(req.params.id, {
         name: name,
         description: description,
         price: price,
         image: image,
         code: code,
-        //color: color,
+        brandId: brand,
         model: model,
         side: side,
         autoPartId : autoPart
