@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const generateJWTToken = async(payload) => {
-    return await jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return await jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });//expiresIn: 60000 });
 }
 
 const generateRefreshToken = async(payload) => {
