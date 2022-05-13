@@ -79,7 +79,20 @@ router.delete("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), async (re
 
 });
 
+router.get("/" , async (req, res) => {
+    const result = await itemRepository.getAllItems();
+    if(typeof result === "string"){
+        res.status(400).json({
+            message: result
+        });
+    }
+    else{
+        res.status(200).json(result);
+    }
+});
+
 router.get("/:id" , async (req, res) => {
+    console.log("1234")
     const result = await itemRepository.getItemById(req.params.id);
     if(typeof result === "string"){
         res.status(404).json({
@@ -92,16 +105,20 @@ router.get("/:id" , async (req, res) => {
 
 });
 
-router.get("/" , async (req, res) => {
-    const result = await itemRepository.getAllItems();
+router.get("/code/:id" , async (req, res) => {
+    console.log("asd")
+    const result = await itemRepository.getItemByCode(req.params.id);
     if(typeof result === "string"){
-        res.status(400).json({
+        res.status(404).json({
             message: result
         });
     }
     else{
         res.status(200).json(result);
     }
+
 });
+
+
 
 module.exports = router;

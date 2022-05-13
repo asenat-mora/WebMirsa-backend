@@ -67,6 +67,26 @@ const updateItem = async(id, item, userId) => {
     }
 }
 
+const getItemByCode = async(code) => {
+    var item = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.code = ? AND I.isDeleted = FALSE', code);
+    if(item.length === 0){
+        return "Item with code = "+ code +" does not exist";
+    }
+    item = item[0];
+    const colors = await pool.query('SELECT C.id, C.name FROM color C JOIN ItemColor IC ON C.id = IC.color_Id WHERE IC.item_Id = ?', item.id);
+    const colordId = []
+    colors.forEach((color) => {
+        colordId.push(color.id);
+    });
+
+    item = {
+        ...item,
+        colors: colordId,
+    }
+
+    return item;
+}
+
 const getItemById = async(id) => {
     var item = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.id = ? AND I.isDeleted = FALSE', id);
     if(item.length === 0){
@@ -126,5 +146,6 @@ module.exports = {
     updateItem,
     getItemById,
     getAllItems,
-    deleteItem
+    deleteItem,
+    getItemByCode
 }
