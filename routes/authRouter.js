@@ -7,6 +7,7 @@ const jwtService = require("../services/jwtService");
 const refreshTokenRepository = require("../repositories/RefreshTokenRepository");
 const validationMiddleware = require("../middlewares/validationMiddleware");
 
+
 const signUpSchema = Joi.object({
 	name: Joi.string().required(),
 	surname: Joi.string().required(),
@@ -82,7 +83,21 @@ router.post("/logout", async (req, res) => {
     res.sendStatus(204);
 });
 
-
+router.post("/refreshToken", async (req, res) => {
+    const { refreshToken } = req.body;
+    const user = await refreshTokenRepository.getUserByRefreshToken(refreshToken);
+    if(!user){
+        res.status(404).json({
+            message: "User with refresh token "+ refreshToken +" not found"
+        });
+    }else{
+        const {id , roles} = user;
+        const jwttoken = await jwtService.generateJWTToken({userId: id, roles: roles});
+        res.status(200).json({
+            accessToken: jwttoken,
+        });
+    }
+});
 
 
 module.exports = router;

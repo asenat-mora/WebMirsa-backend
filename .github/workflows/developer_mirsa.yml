@@ -6,7 +6,7 @@ name: Build and deploy Node.js app to Azure Web App - mirsa
 on:
   push:
     branches:
-      - developer
+      - deploy
   workflow_dispatch:
 
 jobs:
