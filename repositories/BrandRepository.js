@@ -1,5 +1,26 @@
 const pool = require('../db/connection');
 
+function modifyAttributes(brands){
+
+    const operation = { 
+        "CREATED": "Creado",
+        "UPDATED": "Actualizado",
+        "DELETED": "Eliminado"
+    }
+
+    const status = { 
+        0: "Vigente",
+        1: "Eliminado"
+    }
+
+    for(var i = 0; i < brands.length; i++){
+        brands[i].isDeleted = status[brands[i].isDeleted];
+        brands[i].last_modification_description = operation[brands[i].last_modification_description];
+    }
+
+    return brands;
+}
+
 const addDetailsItem = (brand, userId, description) => {
     return {
         ...brand,
@@ -67,8 +88,9 @@ const deleteBrand = async(id, userId) => {
 
 const getAllBrands = async() => {
     try{/* SELECT * FROM brand WHERE isDeleted = FALSE */
-        var brands = await pool.query('SELECT MARCAS.*, MARCAS.name as nombre_marca, MARCAS.id as id_marca, CASE WHEN MARCAS.isDeleted = 0 THEN "Vigente" ELSE "Eliminado" END AS "ESTATUS", CASE WHEN MARCAS.last_modification_description = "UPDATED" THEN "Actualizado" ELSE "Creado" END AS "OPERACION", USUARIO.name as nombre, USUARIO.*, USUARIO.surname as apellido FROM brand MARCAS, user USUARIO WHERE MARCAS.isDeleted = FALSE and MARCAS.id_last_user = USUARIO.id');
-        return brands;
+        //var brands = await pool.query('SELECT MARCAS.*, MARCAS.name as nombre_marca, MARCAS.id as id_marca, CASE WHEN MARCAS.isDeleted = 0 THEN "Vigente" ELSE "Eliminado" END AS "ESTATUS", CASE WHEN MARCAS.last_modification_description = "UPDATED" THEN "Actualizado" ELSE "Creado" END AS "OPERACION", USUARIO.name as nombre, USUARIO.*, USUARIO.surname as apellido FROM brand MARCAS, user USUARIO WHERE MARCAS.isDeleted = FALSE and MARCAS.id_last_user = USUARIO.id');
+        var brands = await pool.query('SELECT B.id, B.name, U.name, U.surname ,B.last_modification_description, B.last_modification_date, B.isDeleted FROM Brand as B JOIN User as U ON B.id_last_user = U.id WHERE B.isDeleted = 0');
+        return modifyAttributes(brands);
     }
     catch(err){
         console.log(err);
@@ -96,6 +118,7 @@ module.exports = {
     updateBrand,
     deleteBrand,
     getAllBrands,
-    getBrandById
+    getBrandById,
+    modifyAttributes
 }
 
