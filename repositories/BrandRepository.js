@@ -66,8 +66,8 @@ const deleteBrand = async(id, userId) => {
 }
 
 const getAllBrands = async() => {
-    try{
-        var brands = await pool.query('SELECT * FROM brand WHERE isDeleted = FALSE');
+    try{/* SELECT * FROM brand WHERE isDeleted = FALSE */
+        var brands = await pool.query('SELECT MARCAS.*, MARCAS.name as nombre_marca, MARCAS.id as id_marca, CASE WHEN MARCAS.isDeleted = 0 THEN "Vigente" ELSE "Eliminado" END AS "ESTATUS", CASE WHEN MARCAS.last_modification_description = "UPDATED" THEN "Actualizado" ELSE "Creado" END AS "OPERACION", USUARIO.name as nombre, USUARIO.*, USUARIO.surname as apellido FROM brand MARCAS, user USUARIO WHERE MARCAS.isDeleted = FALSE and MARCAS.id_last_user = USUARIO.id');
         return brands;
     }
     catch(err){
