@@ -115,14 +115,17 @@ const getItemById = async(id) => {
     }
     item = item[0];
     const colors = await pool.query('SELECT C.id, C.name FROM color C JOIN ItemColor IC ON C.id = IC.color_Id WHERE IC.item_Id = ?', id);
-    const colordId = []
+    const colorsInfo = []
     colors.forEach((color) => {
-        colordId.push(color.id);
+        colorsInfo.push({
+            id: color.id,
+            name: color.name
+        });
     });
 
     item = {
         ...item,
-        colors: colordId,
+        colors: colorsInfo,
     }
 
     return item;
@@ -131,15 +134,18 @@ const getItemById = async(id) => {
 const getAllItems = async() => {
     const items = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.isDeleted = FALSE');
     for (let i = 0; i < items.length; i++) {
-        const colors = await pool.query('SELECT C.id FROM color C JOIN ItemColor IC ON C.id = IC.color_Id WHERE IC.item_Id = ?', items[i].id);
-        const colordId = []
+        const colors = await pool.query('SELECT C.id, C.name FROM color C JOIN ItemColor IC ON C.id = IC.color_Id WHERE IC.item_Id = ?', items[i].id);
+        const colorsResponse = []
         colors.forEach((color) => {
-            colordId.push(color.id);
+            colorsResponse.push({
+                id: color.id,
+                name: color.name
+            });
         });
 
         items[i] = {
             ...items[i],
-            colors: colordId,
+            colors: colorsResponse,
         }
     }
     return items;

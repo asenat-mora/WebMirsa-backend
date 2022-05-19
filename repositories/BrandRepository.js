@@ -1,25 +1,5 @@
 const pool = require('../db/connection');
-
-function modifyAttributes(brands){
-
-    const operation = { 
-        "CREATED": "Creado",
-        "UPDATED": "Actualizado",
-        "DELETED": "Eliminado"
-    }
-
-    const status = { 
-        0: "Vigente",
-        1: "Eliminado"
-    }
-
-    for(var i = 0; i < brands.length; i++){
-        brands[i].isDeleted = status[brands[i].isDeleted];
-        brands[i].last_modification_description = operation[brands[i].last_modification_description];
-    }
-
-    return brands;
-}
+const modifyAttributes = require('../utils/mapOutputs').modifyAttributes;
 
 const addDetailsItem = (brand, userId, description) => {
     return {
