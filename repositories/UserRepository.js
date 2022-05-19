@@ -58,6 +58,12 @@ const getUserById = async(id) => {
     if(user.length === 0){
         return "User with id = "+ id +" does not exist";
     }
+    const rolesQuery = await pool.query('SELECT roleId FROM userRoles WHERE userId = ?', user[0].id);
+    user[0].roles = [];
+    rolesQuery.map(role => {
+        user[0].roles.push(role.roleId);
+    });
+
     return user[0];
 };
 /* Obtener un usuario por email */

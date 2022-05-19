@@ -11,7 +11,7 @@ const brandSchema = Joi.object({
     name: Joi.string().required()
 });
 
-router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(brandSchema, "body"), async (req, res) => {
+router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador, ROLES_LIST.Capturista]), validationMiddleware(brandSchema, "body"), async (req, res) => {
     const { name } = req.body;
     const result = await brandRepository.createBrand({
         name :name
@@ -25,7 +25,7 @@ router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMidd
     }
 });
 
-router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(brandSchema, "body"), async (req, res) => {
+router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador, ROLES_LIST.Capturista]), validationMiddleware(brandSchema, "body"), async (req, res) => {
     const { name } = req.body;
     const result = await brandRepository.updateBrand(req.params.id, {
         name :name
@@ -41,7 +41,7 @@ router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validation
     }
 });
 
-router.delete("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), async (req, res) => {
+router.delete("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador, ROLES_LIST.Capturista]), async (req, res) => {
     const result = await brandRepository.deleteBrand(req.params.id, req.user.userId);
     if(typeof result === "string"){
         res.status(400).json({
