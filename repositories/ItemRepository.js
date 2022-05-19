@@ -72,30 +72,12 @@ const updateItem = async(id, item, userId, colors) => {
 		connection.release();
 
 	} catch (err) {
-/* 		connection.rollback();
+ 		connection.rollback();
 		connection.release();
         console.log(err)
         return err.code;
- */
-		if (err.code === "ER_DUP_ENTRY") {
-			return "Product is already on the db";
-		} else if (err.code === "ER_NO_REFERENCED_ROW_2") {
-            console.log(err)
-			return "Error with a foreign key";
-		}
-        
+          
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 	} catch (err) {
  		connection.rollback();
@@ -103,10 +85,6 @@ const updateItem = async(id, item, userId, colors) => {
         console.log(err)
         return err.code;
 	}
-
-
-
-
 
 }
 
