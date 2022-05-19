@@ -64,8 +64,8 @@ const deleteAutopart = async(id, userId) => {
 }
 
 const getAllAutoparts = async() => {
-    try{
-        var autoParts = await pool.query('SELECT * FROM autopart WHERE isDeleted = FALSE');
+    try{/* SELECT * FROM autopart WHERE isDeleted = FALSE */
+        var autoParts = await pool.query('SELECT A.id as autopartId, A.name as AutopartName, U.name as userName, U.surname as userSurname ,A.last_modification_description, A.last_modification_date, A.isDeleted FROM autopart as A JOIN User as U ON A.id_last_user = U.id WHERE A.isDeleted = 0');
         return autoParts;
     }
     catch(err){

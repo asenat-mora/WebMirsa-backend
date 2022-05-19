@@ -41,30 +41,73 @@ const createItem = async (item, userId, colors) => {
 	}
 };
 
-const updateItem = async(id, item, userId) => {
+const updateItem = async(id, item, userId, colors) => {
 
     var connection = await pool.getConnection();
     item = addDetailsItem(item, userId, "UPDATED");
 
-    try{
-        var query = await pool.query('SELECT * FROM item WHERE id = ?', id);
-        if(query.length === 0){
-            connection.release();
-            return "Item with id = "+ id +" does not exist";
-        }
-        await connection.promise().query('UPDATE item SET ? WHERE id = ?', [item, id]);
-        query = await pool.query('SELECT I.id,I.name,I.description,I.price,I.image,I.side,I.model,I.code, I.autoPartId, A.name as autoPartName, B.name as brandName, B.id as brandId FROM item I JOIN Autopart A on I.autoPartId = A.id JOIN Brand B on I.brandId = B.id WHERE I.id = ? AND I.isDeleted = FALSE', id);
-        connection.release();
-        return query[0];
-    }catch(err){
-        connection.release();
-        if(err.code === 'ER_DUP_ENTRY') {
-            return "Product is already on the db";
-        }else if(err.code === 'ER_NO_REFERENCED_ROW_2'){
-            return "Error with a foreign key";
-        }
+    //Borrar todos los colores
+    try {
+		await connection.promise().beginTransaction();
+	 	connection.promise().query("DELETE FROM ItemColor WHERE item_id = " + id); 
+		connection.promise().commit();
+		connection.release();
+
+    //Actualiza los demas datos
+	try {
+		await connection.promise().beginTransaction();
+		const itemQuery = await connection
+			.promise()
+			.query("UPDATE item SET ? WHERE ID = " + id, item);
+
+            //Agregar los nuevos colores
+		    colors.forEach((color) => {
+		 	connection.promise().query("INSERT INTO ItemColor SET ?", {
+				item_Id: id,
+				color_Id: color,
+			}); 
+		});
+
+		connection.promise().commit();
+		connection.release();
+
+	} catch (err) {
+/* 		connection.rollback();
+		connection.release();
         console.log(err)
-    }
+        return err.code;
+ */
+		if (err.code === "ER_DUP_ENTRY") {
+			return "Product is already on the db";
+		} else if (err.code === "ER_NO_REFERENCED_ROW_2") {
+            console.log(err)
+			return "Error with a foreign key";
+		}
+        
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	} catch (err) {
+ 		connection.rollback();
+		connection.release();
+        console.log(err)
+        return err.code;
+	}
+
+
+
+
+
 }
 
 const getItemByCode = async(code) => {

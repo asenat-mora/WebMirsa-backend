@@ -19,6 +19,11 @@ const itemSchema = Joi.object({
     autoPart: Joi.number().required(),
 });
 
+const deleteitemSchema = Joi.object({
+    id: Joi.number().required(),
+    userid: Joi.number().required()
+});
+
 router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(itemSchema, "body"), async (req, res) => {
     const { name, description, price, image, colors, model, code, side, brand, autoPart } = req.body;
     const result = await itemRepository.createItem({
@@ -43,7 +48,7 @@ router.post("/" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMidd
 });
 
 router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validationMiddleware(itemSchema, "body"), async (req, res) => {
-    const { name, description, price, image, model ,code, side, brand ,autoPart } = req.body;
+    const { name, description, price, image, colors, model ,code, side, brand ,autoPart } = req.body;
     const result = await itemRepository.updateItem(req.params.id, {
         name: name,
         description: description,
@@ -54,7 +59,7 @@ router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validation
         model: model,
         side: side,
         autoPartId : autoPart
-    }, req.user.userId);
+    }, req.user.userId, colors);
 
     if(typeof result === "string"){
         res.status(400).json({
@@ -66,6 +71,7 @@ router.patch("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), validation
     }
 });
 
+
 router.delete("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), async (req, res) => {
     const result = await itemRepository.deleteItem(req.params.id, req.user.userId);
     if(typeof result === "string"){
@@ -76,8 +82,8 @@ router.delete("/:id" , jwtRolesMiddleware([ROLES_LIST.Administrador]), async (re
     else{
         res.sendStatus(204);
     }
-
 });
+
 
 router.get("/" , async (req, res) => {
     const result = await itemRepository.getAllItems();
