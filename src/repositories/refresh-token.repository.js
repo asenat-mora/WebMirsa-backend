@@ -1,5 +1,5 @@
 const pool = require('../db/connection');
-const userRepository = require('./UserRepository');
+const userRepository = require('./user.repository');
 /* insertar token de refresco */
 const insertRefreshToken = async(refreshToken, userId, expiresIn) => {
     try{

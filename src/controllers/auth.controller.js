@@ -2,10 +2,10 @@ const router = require("express").Router();
 const Joi = require("joi");
 const argon2 = require('argon2');
 
-const userRepository = require("../repositories/UserRepository");
-const jwtService = require("../services/jwtService");
-const refreshTokenRepository = require("../repositories/RefreshTokenRepository");
-const validationMiddleware = require("../middlewares/validationMiddleware");
+const userRepository = require("../repositories/user.repository");
+const jwtService = require("../services/jwt.service");
+const refreshTokenRepository = require("../repositories/refresh-token.repository");
+const validationMiddleware = require("../middlewares/validation.middleware");
 
 
 const signUpSchema = Joi.object({
@@ -21,6 +21,7 @@ const loginSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
 });
+
 
 /* end-point registro */
 router.post("/signUp", validationMiddleware(signUpSchema, "body"), async (req, res) => {

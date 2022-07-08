@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const Joi = require("joi");
 
-const validationMiddleware = require("../middlewares/validationMiddleware");
-const jwtRolesMiddleware = require("../middlewares/jwtRolesMiddleware");
-const itemRepository = require("../repositories/itemRepository");
+const validationMiddleware = require("../middlewares/validation.middleware");
+const jwtRolesMiddleware = require("../middlewares/jwt-roles.middleware");
+const itemRepository = require("../repositories/item.repository");
 const ROLES_LIST = require("../config/roles");
 
 const itemSchema = Joi.object({

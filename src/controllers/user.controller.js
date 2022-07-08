@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const Joi = require("joi");
 
-const repository = require("../repositories/UserRepository");
-const validationMiddleware = require("../middlewares/validationMiddleware");
+const repository = require("../../repositories/UserRepository");
+const validationMiddleware = require("../middlewares/validation.middleware");
 
 const updateSchema = Joi.object({
     name: Joi.string().required(),

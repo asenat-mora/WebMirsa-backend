@@ -1,5 +1,6 @@
 const pool = require('../db/connection');
-const modifyAttributes = require('../utils/mapOutputs').modifyAttributes;
+const modifyAttributes = require("../utils/map-outputs.utils").modifyAttributes;
+
 
 const addDetailsItem = (brand, userId, description) => {
     return {
