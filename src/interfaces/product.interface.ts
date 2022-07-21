@@ -8,5 +8,11 @@ interface IProduct{
     side: string;
 }
 
+interface IProductFilters {
+	description: string;
+	brands: Array<number>;
+	accessories: Array<number>;
+	colors: Array<number>;
+}
 
-export { IProduct };
+export { IProduct, IProductFilters};
