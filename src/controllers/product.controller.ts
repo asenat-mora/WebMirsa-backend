@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { IProduct } from "../interfaces/product.interface";
+import { IProduct, IProductFilters } from "../interfaces/product.interface";
 import { CustomRequest } from "../interfaces/request.interface";
 import jwtRolesMiddleware from "../middlewares/jwt-roles.middleware";
 import validationMiddleware from "../middlewares/validation.middleware";
 import { productSchema } from "../models/product.model";
 import Roles from "../models/roles.model";
-import { createProduct, deleteProduct, getAllProducts, getProductByCode, getProductById, updateProduct } from "../repositories/product.repository";
+import { createProduct, deleteProduct, filterByAtrributes, getAllProducts, getProductByCode, getProductById, updateProduct } from "../repositories/product.repository";
 
 const router = Router();
 
@@ -64,6 +64,28 @@ router.get("/code/:id", async(req: Request, res: Response, next: NextFunction) =
         const result = await getProductByCode(req.params.id);
         res.status(200).json(result);
     } catch(error){
+        next(error);
+    }
+});
+
+/*
+router.post("/search", validationMiddleware(filterSchema, "body") , async(req: Request, res: Response, next: NextFunction) => {
+    try{
+        const attributes = req.body as IProductFilters;
+        const result = await filterByAtrributes(attributes.brands || [], attributes.accessories|| [], attributes.colors || [], attributes.description || "");
+        res.status(200).json(result);
+    }catch(error){
+        next(error);
+    }
+});
+*/
+
+router.get("/search/filter", async(req: Request, res: Response, next: NextFunction) => {
+    try{
+        const attributes = req.query as unknown as IProductFilters;
+        const result = await filterByAtrributes(attributes.brands || [], attributes.accessories || [], attributes.colors || [], attributes.description || "", attributes.side.toLowerCase() || "");
+        res.status(200).json(result);
+    }catch(error){
         next(error);
     }
 });

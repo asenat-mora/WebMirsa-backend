@@ -11,34 +11,19 @@ const selectObject = {
 	image: true,
 	model: true,
 	side: true,
-	brand: {
-		select: {
-			id: true,
-			name: true,
-		},
-	},
-	accessory: {
-		select: {
-			id: true,
-			name: true,
-		},
-	},
+	brandId: true,
+    accessoryId: true,
 	productcolor: {
 		select: {
 			color: {
 				select: {
 					id: true,
-					name: true,
+					//name: true,
 				},
 			},
 		},
 	},
-	user: {
-		select: {
-			id: true,
-			name: true,
-		},
-	},
+	id_last_user: true,
 	last_modification_description: true,
 	isDeleted: true,
 }
@@ -110,7 +95,7 @@ async function updateProduct(product: IProduct, productId: number, accessoryId: 
                 }
             }
         },
-        select: selectObject
+        
     });
 
     const transaction = await prisma.$transaction([deletedColors, updateP]);
@@ -159,4 +144,86 @@ async function getProductByCode(code: string){
     });
 }
 
-export { createProduct, updateProduct, deleteProduct, getProductById, getAllProducts, getProductByCode };
+function returnBrandSearchObject(brands: Array<number>, searchObject: any) {
+    if(brands.length === 0 || brands === null) {
+        return searchObject;
+    }
+    brands = brands.map(Number);
+    searchObject.brandId = {
+        in: brands
+    }
+    return searchObject;
+
+}
+
+function returnColorsSearchObject(colors: Array<number>, searchObject: any){
+    if(colors.length === 0 || colors === null) {
+        return searchObject;
+    }
+    colors = colors.map(Number);
+    searchObject.productcolor = {
+        some: {
+            color_id: {
+                in: colors
+            }
+        }
+    }
+    return searchObject;
+}
+
+function returnAccessoriesSearchObject(accessories: Array<number>, searchObject: any){
+    if(accessories.length === 0 || accessories === null) {
+        return searchObject;
+    }
+    accessories = accessories.map(Number);
+    searchObject.accessoryId = {
+        in: accessories
+    }
+    return searchObject;
+}
+
+function returnDescriptionSearchObject(description: string, searchObject: any){
+    if(description === null || description === "") {
+        return searchObject;
+    }
+    searchObject.description = {
+        contains: description
+    }
+    return searchObject;
+}
+
+function returnSideSearchObject(side: string, searchObject: any){
+    if(side.length === 0 || side === null || side === "ambos") {
+        return searchObject;
+    }
+    
+    searchObject.side = {
+        contains: side
+    }
+    return searchObject;
+}
+
+
+async function filterByAtrributes(brands: Array<number>, accessories: Array<number>, colors: Array<number>, description: string, side: string){
+
+    let searchObject = {}
+    returnBrandSearchObject(brands, searchObject);
+    returnAccessoriesSearchObject(accessories, searchObject);
+    returnColorsSearchObject(colors, searchObject);
+    returnDescriptionSearchObject(description, searchObject);
+    returnSideSearchObject(side, searchObject);
+
+
+    return await prisma.product.findMany({
+        where:{
+            AND: [
+                searchObject
+            ],
+            isDeleted: false
+        },
+        
+        select: selectObject
+    });
+}
+
+export { createProduct, updateProduct, deleteProduct, getProductById, getAllProducts, getProductByCode, filterByAtrributes };
