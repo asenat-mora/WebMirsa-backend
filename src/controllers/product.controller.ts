@@ -83,7 +83,7 @@ router.post("/search", validationMiddleware(filterSchema, "body") , async(req: R
 router.get("/search/filter", async(req: Request, res: Response, next: NextFunction) => {
     try{
         const attributes = req.query as unknown as IProductFilters;
-        const result = await filterByAtrributes(attributes.brands || [], attributes.accessories || [], attributes.colors || [], attributes.description || "");
+        const result = await filterByAtrributes(attributes.brands || [], attributes.accessories || [], attributes.colors || [], attributes.description || "", attributes.side.toLowerCase() || "");
         res.status(200).json(result);
     }catch(error){
         next(error);

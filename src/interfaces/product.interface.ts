@@ -13,6 +13,7 @@ interface IProductFilters {
 	brands: Array<number>;
 	accessories: Array<number>;
 	colors: Array<number>;
+    side: string;
 }
 
 export { IProduct, IProductFilters};

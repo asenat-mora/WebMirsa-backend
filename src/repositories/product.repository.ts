@@ -192,13 +192,26 @@ function returnDescriptionSearchObject(description: string, searchObject: any){
     return searchObject;
 }
 
-async function filterByAtrributes(brands: Array<number>, accessories: Array<number>, colors: Array<number>, description: string){
+function returnSideSearchObject(side: string, searchObject: any){
+    if(side.length === 0 || side === null || side === "ambos") {
+        return searchObject;
+    }
+    
+    searchObject.side = {
+        contains: side
+    }
+    return searchObject;
+}
+
+
+async function filterByAtrributes(brands: Array<number>, accessories: Array<number>, colors: Array<number>, description: string, side: string){
 
     let searchObject = {}
     returnBrandSearchObject(brands, searchObject);
     returnAccessoriesSearchObject(accessories, searchObject);
     returnColorsSearchObject(colors, searchObject);
     returnDescriptionSearchObject(description, searchObject);
+    returnSideSearchObject(side, searchObject);
 
 
     return await prisma.product.findMany({
