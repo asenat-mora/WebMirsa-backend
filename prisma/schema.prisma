@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model accessory {
+  id                            Int      @id @default(autoincrement())
+  name                          String   @unique(map: "name")
+  id_last_user                  Int
+  last_modification_description String
+  last_modification_date        DateTime @updatedAt
+  isDeleted                     Boolean  @default(false)
+  user                          user     @relation(fields: [id_last_user], references: [id], map: "Accessory_id_last_user_fkey")
+  product                       product[]
+
+  @@index([id_last_user], map: "Accessory_id_last_user_fkey")
+}
+
+model brand {
+  id                            Int      @id @default(autoincrement())
+  name                          String   @unique(map: "name")
+  id_last_user                  Int
+  last_modification_description String
+  last_modification_date        DateTime @updatedAt
+  isDeleted                     Boolean  @default(false)
+  user                          user     @relation(fields: [id_last_user], references: [id], map: "Brand_id_last_user_fkey")
+  product                       product[]
+
+  @@index([id_last_user], map: "Brand_id_last_user_fkey")
+}
+
+model color {
+  id        Int         @id @default(autoincrement())
+  name      String
+  productcolor productcolor[]
+}
+
+model product {
+  id                            Int         @id @default(autoincrement())
+  code                          String      @unique(map: "code")
+  sku                           String
+  description                   String
+  price                         Int
+  image                         String
+  model                         String
+  side                          String
+  id_last_user                  Int
+  accessoryId                   Int
+  brandId                       Int
+  last_modification_description String
+  last_modification_date        DateTime    @updatedAt
+  isDeleted                     Boolean     @default(false)
+  accessory                     accessory   @relation(fields: [accessoryId], references: [id], map: "Product_accessoryId_fkey")
+  brand                         brand       @relation(fields: [brandId], references: [id], map: "Product_brandId_fkey")
+  user                          user        @relation(fields: [id_last_user], references: [id], map: "Product_id_last_user_fkey")
+  productcolor                  productcolor[]
+
+  @@index([accessoryId], map: "Product_accessoryId_fkey")
+  @@index([brandId], map: "Product_brandId_fkey")
+  @@index([id_last_user], map: "Product_id_last_user_fkey")
+}
+
+model productcolor {
+  product_id  Int
+  color_id Int
+  color    color @relation(fields: [color_id], references: [id], map: "ProductColor_color_id_fkey")
+  product  product  @relation(fields: [product_id], references: [id], map: "ProductColor_item_id_fkey")
+
+  @@id([product_id, color_id])
+  @@index([color_id], map: "ProductColor_color_id_fkey")
+}
+
+model refreshtoken {
+  id             Int      @id @default(autoincrement())
+  token          String   @unique(map: "RefreshToken_token_unique")
+  userId         Int
+  expirationDate DateTime @db.DateTime(0)
+  user           user     @relation(fields: [userId], references: [id], map: "RefreshToken_userId_fkey")
+
+  @@index([userId], map: "RefreshToken_userId_fkey")
+}
+
+model role {
+  id        Int         @id @default(autoincrement())
+  name      String
+  users userroles[]
+}
+
+model user {
+  id                Int            @id @default(autoincrement())
+  name              String
+  surname           String
+  email             String         @unique(map: "User_email_key")
+  verificationEmail String
+  password          String
+  accessory         accessory[]
+  brand             brand[]
+  product           product[]
+  refreshtoken      refreshtoken[]
+  roles             userroles[]
+}
+
+model userroles {
+  userId Int
+  roleId Int
+  role   role @relation(fields: [roleId], references: [id], map: "UserRoles_roleId_fkey")
+  user   user @relation(fields: [userId], references: [id], map: "UserRoles_userId_fkey")
+
+  @@id([userId, roleId])
+  @@index([roleId], map: "UserRoles_roleId_fkey")
+}
