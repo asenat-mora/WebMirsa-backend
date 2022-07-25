@@ -182,21 +182,22 @@ function returnAccessoriesSearchObject(accessories: Array<number>, searchObject:
     return searchObject;
 }
 
-function returnDescriptionSearchObject(description: string, searchObject: any){
+function returnDescriptionSearchObject(description: string){
     if(description === null || description === "") {
-        return searchObject;
+        return {
+            id: { not: 0 }
+        };
     }
-    searchObject.description = {
-        contains: description
-    }
-    return searchObject;
+    
+    return [{sku :{contains: description}},
+            {description : {contains: description}},
+            {code :{contains: description}}];
 }
 
 function returnSideSearchObject(side: string, searchObject: any){
-    if(side.length === 0 || side === null || side === "ambos") {
+    if(side.length === 0 || side === null) {
         return searchObject;
     }
-    
     searchObject.side = {
         contains: side
     }
@@ -207,18 +208,20 @@ function returnSideSearchObject(side: string, searchObject: any){
 async function filterByAtrributes(brands: Array<number>, accessories: Array<number>, colors: Array<number>, description: string, side: string){
 
     let searchObject = {}
+    let descriptionObject = returnDescriptionSearchObject(description);
     returnBrandSearchObject(brands, searchObject);
     returnAccessoriesSearchObject(accessories, searchObject);
     returnColorsSearchObject(colors, searchObject);
-    returnDescriptionSearchObject(description, searchObject);
     returnSideSearchObject(side, searchObject);
-
 
     return await prisma.product.findMany({
         where:{
             AND: [
-                searchObject
+                searchObject,
             ],
+            OR:
+                descriptionObject
+            ,
             isDeleted: false
         },
         
