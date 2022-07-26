@@ -13,4 +13,12 @@ const productSchema : Joi.Schema = Joi.object({
     accessoryId: Joi.number().required(),
 });
 
-export { productSchema };
+const queryProductSchema : Joi.Schema = Joi.object({
+    brands: Joi.array().items(Joi.number()),
+    accessories: Joi.array().items(Joi.number()),
+    colors: Joi.array().items(Joi.number()),
+    description: Joi.string(),
+    side: Joi.string()
+});
+
+export { productSchema, queryProductSchema };

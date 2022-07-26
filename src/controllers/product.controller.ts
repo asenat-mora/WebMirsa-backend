@@ -3,7 +3,7 @@ import { IProduct, IProductFilters } from "../interfaces/product.interface";
 import { CustomRequest } from "../interfaces/request.interface";
 import jwtRolesMiddleware from "../middlewares/jwt-roles.middleware";
 import validationMiddleware from "../middlewares/validation.middleware";
-import { productSchema } from "../models/product.model";
+import { productSchema, queryProductSchema } from "../models/product.model";
 import Roles from "../models/roles.model";
 import { createProduct, deleteProduct, filterByAtrributes, getAllProducts, getProductByCode, getProductById, updateProduct } from "../repositories/product.repository";
 
@@ -80,9 +80,10 @@ router.post("/search", validationMiddleware(filterSchema, "body") , async(req: R
 });
 */
 
-router.get("/search/filter", async(req: Request, res: Response, next: NextFunction) => {
+router.get("/search/filter", validationMiddleware(queryProductSchema, "query"),async(req: Request, res: Response, next: NextFunction) => {
     try{
         const attributes = req.query as unknown as IProductFilters;
+        console.log(attributes.side);
         const result = await filterByAtrributes(attributes.brands || [], attributes.accessories || [], attributes.colors || [], attributes.description || "", attributes.side || "");
         res.status(200).json(result);
     }catch(error){
