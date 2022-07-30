@@ -2,7 +2,6 @@ import Joi from "joi";
 
 const productSchema : Joi.Schema = Joi.object({
     sku: Joi.string().required(),
-    code: Joi.string().required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
     image: Joi.string().required(),
