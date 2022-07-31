@@ -17,7 +17,7 @@ const selectObject = {
 			color: {
 				select: {
 					id: true,
-					//name: true,
+					name: true,
 				},
 			},
 		},
