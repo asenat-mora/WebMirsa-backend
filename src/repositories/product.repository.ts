@@ -4,7 +4,6 @@ import Operations from "../models/operations.model";
 
 const selectObject = {
 	id: true,
-	code: true,
 	sku: true,
 	description: true,
 	price: true,
@@ -18,7 +17,7 @@ const selectObject = {
 			color: {
 				select: {
 					id: true,
-					//name: true,
+					name: true,
 				},
 			},
 		},
@@ -135,14 +134,14 @@ async function getAllProducts(){
     });
 }
 
-async function getProductByCode(code: string){
+/* async function getProductByCode(code: string){
     return await prisma.product.findUnique({
         where: {
             code: code
         },
         select: selectObject
     });
-}
+} */
 
 function returnBrandSearchObject(brands: Array<number>, searchObject: any) {
     if(brands.length === 0 || brands === null) {
@@ -182,21 +181,21 @@ function returnAccessoriesSearchObject(accessories: Array<number>, searchObject:
     return searchObject;
 }
 
-function returnDescriptionSearchObject(description: string, searchObject: any){
+function returnDescriptionSearchObject(description: string){
     if(description === null || description === "") {
-        return searchObject;
+        return {
+            id: { not: 0 }
+        };
     }
-    searchObject.description = {
-        contains: description
-    }
-    return searchObject;
+    
+    return [{sku :{contains: description}},
+            {description : {contains: description}}];
 }
 
 function returnSideSearchObject(side: string, searchObject: any){
-    if(side.length === 0 || side === null || side === "ambos") {
+    if(side.length === 0 || side === null) {
         return searchObject;
     }
-    
     searchObject.side = {
         contains: side
     }
@@ -207,18 +206,20 @@ function returnSideSearchObject(side: string, searchObject: any){
 async function filterByAtrributes(brands: Array<number>, accessories: Array<number>, colors: Array<number>, description: string, side: string){
 
     let searchObject = {}
+    let descriptionObject = returnDescriptionSearchObject(description);
     returnBrandSearchObject(brands, searchObject);
     returnAccessoriesSearchObject(accessories, searchObject);
     returnColorsSearchObject(colors, searchObject);
-    returnDescriptionSearchObject(description, searchObject);
     returnSideSearchObject(side, searchObject);
-
 
     return await prisma.product.findMany({
         where:{
             AND: [
-                searchObject
+                searchObject,
             ],
+            OR:
+                descriptionObject
+            ,
             isDeleted: false
         },
         
@@ -226,4 +227,4 @@ async function filterByAtrributes(brands: Array<number>, accessories: Array<numb
     });
 }
 
-export { createProduct, updateProduct, deleteProduct, getProductById, getAllProducts, getProductByCode, filterByAtrributes };
+export { createProduct, updateProduct, deleteProduct, getProductById, getAllProducts, filterByAtrributes };
