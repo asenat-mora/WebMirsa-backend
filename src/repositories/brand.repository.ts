@@ -5,7 +5,7 @@ import  Operations from "../models/operations.model";
 async function createBrand(brand: IBrand, userId: number) {
     return prisma.brand.create({
         data: {
-            name: brand.name,
+            ...brand,
             last_modification_description: Operations.Created,
             user: {
                 connect: {
@@ -23,6 +23,7 @@ async function updateBrand(brand: IBrandEdit, userId: number) {
         },
         data: {
             name: brand.name,
+            key: brand.key,
             last_modification_description: Operations.Updated,
             user: {
                 connect: {
@@ -33,6 +34,7 @@ async function updateBrand(brand: IBrandEdit, userId: number) {
         select: {
             id: true,
             name: true,
+            key: true,
             last_modification_description: true,
             user: {
                 select: {
@@ -66,6 +68,7 @@ async function getAllBrands() {
         select: {
             id: true,
             name: true,
+            key: true,
             last_modification_description: true,
             user: {
                 select: {
@@ -84,6 +87,7 @@ async function getBrandById(id: number) {
         select: {
             id: true,
             name: true,
+            key: true,
             last_modification_description: true,
             isDeleted: true,
             user: {

@@ -20,7 +20,7 @@ router.post("/", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]), va
 });
 
 router.patch("/:id", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]), validationMiddleware(brandSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
-    const brand : IBrandEdit = {name : req.body.name , id: Number(req.params.id)};
+    const brand : IBrandEdit = {name : req.body.name , key: req.body.key , id: Number(req.params.id)};
     try{
         const result = await updateBrand(brand, (req as CustomRequest).user!.userId);
         res.status(200).json(result);
