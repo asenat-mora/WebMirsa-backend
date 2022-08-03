@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `brand` ADD COLUMN `key` VARCHAR(191) NOT NULL DEFAULT '';
+
+-- AlterTable
+ALTER TABLE `product` MODIFY `price` INTEGER NOT NULL DEFAULT 0;

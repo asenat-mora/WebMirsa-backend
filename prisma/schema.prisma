@@ -23,6 +23,7 @@ model accessory {
 model brand {
   id                            Int      @id @default(autoincrement())
   name                          String   @unique(map: "name")
+  key                           String   @unique(map: "key")
   id_last_user                  Int
   last_modification_description String
   last_modification_date        DateTime @updatedAt
@@ -43,7 +44,7 @@ model product {
   id                            Int         @id @default(autoincrement())
   sku                           String
   description                   String
-  price                         Int
+  price                         Int         @default(0)
   image                         String
   model                         String
   side                          String
