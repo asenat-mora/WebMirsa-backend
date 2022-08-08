@@ -3,7 +3,7 @@ import Joi from "joi";
 const productSchema : Joi.Schema = Joi.object({
     sku: Joi.string().required(),
     description: Joi.string().required(),
-    price: Joi.number().required(),
+    price: Joi.number(),
     image: Joi.string().required(),
     colors: Joi.array().items(Joi.number()).required(),
     model: Joi.string().required(),
