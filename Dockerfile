@@ -15,7 +15,7 @@ FROM node:16.0.0-alpine3.13 AS release
 
 ARG NODE_ENV=production
 
-COPY --from=builder /app/prisma ./prisma/
+COPY prisma ./prisma/
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 
