@@ -65,6 +65,9 @@ async function deleteBrand(id: number, userId: number) {
 
 async function getAllBrands() {
     return await prisma.brand.findMany({
+        where: {
+            isDeleted: false
+        },
         select: {
             id: true,
             name: true,
