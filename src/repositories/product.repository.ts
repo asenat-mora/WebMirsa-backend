@@ -130,6 +130,9 @@ async function getProductById(productId: number){
 
 async function getAllProducts(){
     return await prisma.product.findMany({
+        where: {
+            isDeleted: false
+        },
         select: selectObject
     });
 }
