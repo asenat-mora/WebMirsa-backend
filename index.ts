@@ -23,10 +23,16 @@ const port = process.env.PORT || 3000;
 app.use((err: Error | Prisma.PrismaClientKnownRequestError, req: Request, res: Response, next: NextFunction) => {
     // @ts-ignore
     if (err && err.meta) {
-      // @ts-ignore
-      res.status(400).json({message: err.message});
+        // @ts-ignore
+        if(err.code === 'P2002'){
+            // @ts-ignore
+            res.status(409).json({message: err.message, target: err.meta.target});
+        }else{
+            res.status(400).json({message: err.message});
+        }
+      
     } else if (err) {
-      res.status(500).json({message: err.message});
+        res.status(500).json({message: err.message});
     }
 });
 
