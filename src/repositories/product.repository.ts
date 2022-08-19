@@ -29,34 +29,68 @@ const selectObject = {
 
 async function createProduct(product: IProduct, accessoryId: number, brandId:number, colors: Array<number>, userId: number){
 
-    const productCreated = await prisma.product.create({
-        data: {
-            ...product,
-            last_modification_description: Operations.Created,
-            brand: {
-                connect: {
-                    id: brandId
-                }
+    const checkProduct = await getProductBySKU(product.sku);
+
+    if(checkProduct){
+        return await prisma.product.update({
+            where: {
+                id: checkProduct.id
             },
-            accessory: {
-                connect: {
-                    id: accessoryId
-                }
-            },
-            productcolor: {
-                create: colors.map(color => ({
-                    color_id: color
-                }))
-            },
-            user: {
-                connect: {
-                    id: userId
+            data: {
+                ...product,
+                isDeleted: false,
+                last_modification_description: Operations.Created,
+                brand: {
+                    connect: {
+                        id: brandId
+                    }
+                },
+                accessory: {
+                    connect: {
+                        id: accessoryId
+                    }
+                },
+                productcolor: {
+                    create: colors.map(color => ({
+                        color_id: color
+                    }))
+                },
+                user: {
+                    connect: {
+                        id: userId
+                    }
                 }
             }
-        }
-    });
+        });
 
-    return productCreated;
+    }else{
+        return await prisma.product.create({
+            data: {
+                ...product,
+                last_modification_description: Operations.Created,
+                brand: {
+                    connect: {
+                        id: brandId
+                    }
+                },
+                accessory: {
+                    connect: {
+                        id: accessoryId
+                    }
+                },
+                productcolor: {
+                    create: colors.map(color => ({
+                        color_id: color
+                    }))
+                },
+                user: {
+                    connect: {
+                        id: userId
+                    }
+                }
+            }
+        });
+    }
 }
 
 async function updateProduct(product: IProduct, productId: number, accessoryId: number, brandId:number, colors: Array<number>, userId: number){
@@ -145,6 +179,27 @@ async function getAllProducts(){
         select: selectObject
     });
 } */
+
+async function getProductBySKU(sku: string){
+    return await prisma.product.findFirst({
+        where: {
+            AND:[
+                {
+                    sku: {
+                        equals: sku
+                    },
+                    isDeleted: true
+                }
+                
+            ]
+            
+        },
+        select: {
+            id: true,
+            sku: true,
+        }
+    });
+} 
 
 function returnBrandSearchObject(brands: Array<number>, searchObject: any) {
     if(brands.length === 0 || brands === null) {

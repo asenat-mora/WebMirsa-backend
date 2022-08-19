@@ -3,17 +3,38 @@ import { IBrand, IBrandEdit } from "../interfaces/brand.interface";
 import  Operations from "../models/operations.model";
 
 async function createBrand(brand: IBrand, userId: number) {
-    return prisma.brand.create({
-        data: {
-            ...brand,
-            last_modification_description: Operations.Created,
-            user: {
-                connect: {
-                    id: userId
+    const checkBrandName = await getBrandByName(brand.name);
+    const checkBrandKey = await getBrandByKey(brand.key);
+
+    if((checkBrandName) || (checkBrandKey)){
+        return await prisma.brand.update({
+            where: {
+                id: checkBrandName?.id || checkBrandKey?.id
+            },
+            data: {
+                ...brand,
+                isDeleted: false,
+                last_modification_description: Operations.Created,
+                user: {
+                    connect: {
+                        id: userId
+                    }
                 }
             }
-        }
-    });
+        });
+    }else{
+        return prisma.brand.create({
+            data: {
+                ...brand,
+                last_modification_description: Operations.Created,
+                user: {
+                    connect: {
+                        id: userId
+                    }
+                }
+            }
+        });
+    }
 }
 
 async function updateBrand(brand: IBrandEdit, userId: number) {
@@ -98,6 +119,46 @@ async function getBrandById(id: number) {
                     id: true,
                 }
             }
+        }
+    });
+}
+
+async function getBrandByName(name: string) {
+    return await prisma.brand.findFirst({
+        where: {
+            AND: [
+                {
+                    name: name,
+                    isDeleted: true
+                }
+            ]
+        },
+        select: {
+            id: true,
+            name: true,
+            key: true,
+            last_modification_description: true,
+            isDeleted: true
+        }
+    });
+}
+
+async function getBrandByKey(key: string) {
+    return await prisma.brand.findFirst({
+        where: {
+            AND: [
+                {
+                    key: key,
+                    isDeleted: true
+                }
+            ]
+        },
+        select: {
+            id: true,
+            name: true,
+            key: true,
+            last_modification_description: true,
+            isDeleted: true
         }
     });
 }

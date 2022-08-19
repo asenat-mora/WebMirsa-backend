@@ -42,7 +42,7 @@ model color {
 
 model product {
   id                            Int         @id @default(autoincrement())
-  sku                           String
+  sku                           String      @unique(map: "sku")
   description                   String
   price                         Int         @default(0)
   image                         String

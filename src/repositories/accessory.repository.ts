@@ -3,17 +3,39 @@ import { IAccessory, IAccessoryEdit } from "../interfaces/accessory.interface";
 import  Operations from "../models/operations.model";
 
 async function createAccessory(accessory: IAccessory, userId: number) {
-    return prisma.accessory.create({
-        data: {
-            name: accessory.name,
-            last_modification_description: Operations.Created,
-            user: {
-                connect: {
-                    id: userId
+
+    const checkAccessory = await getAccessoryByName(accessory.name);
+
+    if(checkAccessory){
+        return await prisma.accessory.update({
+            where: {
+                id: checkAccessory.id
+            },
+            data: {
+                isDeleted: false,
+                last_modification_description: Operations.Created,
+                user: {
+                    connect: {
+                        id: userId
+                    }
                 }
             }
-        }
-    });
+        });
+    }else{
+        return prisma.accessory.create({
+            data: {
+                name: accessory.name,
+                last_modification_description: Operations.Created,
+                user: {
+                    connect: {
+                        id: userId
+                    }
+                }
+            }
+        });
+    }
+
+    
 }
 
 async function updateAccessory(accessory: IAccessoryEdit, userId: number){
@@ -94,6 +116,26 @@ async function getAccessoryById(id: number){
                     id: true,
                 }
             }
+        }
+    });
+}
+
+async function getAccessoryByName(name: string){
+    return await prisma.accessory.findFirst({
+        where: {
+            AND:[
+                {
+                    name: name,
+                    isDeleted: true
+                }
+            ]
+            
+        },
+        select: {
+            id: true,
+            name: true,
+            last_modification_description: true,
+            isDeleted: true
         }
     });
 }
