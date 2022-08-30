@@ -18,4 +18,13 @@ const logoutSchema : Joi.Schema = Joi.object({
     refreshToken: Joi.string().required(),
 });
 
-export { signUpSchema, loginSchema, logoutSchema };
+const editUserSchema : Joi.Schema = Joi.object({
+    name: Joi.string().required(),
+	surname: Joi.string().required(),
+	email: Joi.string().email().required(),
+	password: Joi.string().required(),
+	verificationEmail: Joi.string().email().required(),
+    roles: Joi.array().items(Joi.number()).required(),
+});
+
+export { signUpSchema, loginSchema, logoutSchema, editUserSchema };
