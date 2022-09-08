@@ -12,7 +12,7 @@ const router = Router();
 router.post("/", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]), validationMiddleware(productSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
     const product : IProduct = {sku: req.body.sku, description: req.body.description, price: req.body.price, image: req.body.image, model: req.body.model, side: req.body.side};
     try{
-        const result = await createProduct(product, req.body.accessoryId , req.body.brandId, req.body.colors, req.body.subBrands, (req as CustomRequest).user!.userId);
+        const result = await createProduct(product, req.body.accessoryId , req.body.brandId, req.body.colors, req.body.subBrands || [], (req as CustomRequest).user!.userId);
         res.sendStatus(204);
     }
     catch(error){
@@ -23,7 +23,7 @@ router.post("/", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]), va
 router.patch("/:id", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]), validationMiddleware(productSchema, "body"), async (req: Request, res: Response, next: NextFunction) => {
     const product : IProduct = {sku: req.body.sku, description: req.body.description, price: req.body.price, image: req.body.image, model: req.body.model, side: req.body.side};
     try{
-        const result = await updateProduct(product, Number(req.params.id), req.body.accessoryId , req.body.brandId, req.body.colors, req.body.subBrands, (req as CustomRequest).user!.userId);
+        const result = await updateProduct(product, Number(req.params.id), req.body.accessoryId , req.body.brandId, req.body.colors, req.body.subBrands || [], (req as CustomRequest).user!.userId);
         res.status(200).json(result);
     }
     catch(error){
@@ -58,27 +58,6 @@ router.get("/:id", async(req: Request, res: Response, next: NextFunction) => {
         next(error);
     }
 });
-
-/* router.get("/code/:id", async(req: Request, res: Response, next: NextFunction) => {
-    try{
-        const result = await getProductByCode(req.params.id);
-        res.status(200).json(result);
-    } catch(error){
-        next(error);
-    }
-}); */
-
-/*
-router.post("/search", validationMiddleware(filterSchema, "body") , async(req: Request, res: Response, next: NextFunction) => {
-    try{
-        const attributes = req.body as IProductFilters;
-        const result = await filterByAtrributes(attributes.brands || [], attributes.accessories|| [], attributes.colors || [], attributes.description || "");
-        res.status(200).json(result);
-    }catch(error){
-        next(error);
-    }
-});
-*/
 
 router.get("/search/filter", validationMiddleware(queryProductSchema, "query"),async(req: Request, res: Response, next: NextFunction) => {
     try{
