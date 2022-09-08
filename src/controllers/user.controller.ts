@@ -7,7 +7,6 @@ import { IUser } from "../interfaces/user.interface";
 import { createUser } from "../repositories/user.repository";
 import jwtRolesMiddleware from "../middlewares/jwt-roles.middleware";
 import Roles from "../models/roles.model";
-import { CustomRequest } from "../interfaces/request.interface";
 
 const router = Router();
 

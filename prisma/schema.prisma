@@ -30,8 +30,23 @@ model brand {
   isDeleted                     Boolean  @default(false)
   user                          user     @relation(fields: [id_last_user], references: [id], map: "Brand_id_last_user_fkey")
   product                       product[]
+  subbrand                      subbrand[]
 
   @@index([id_last_user], map: "Brand_id_last_user_fkey")
+}
+
+model subbrand{
+    id                            Int      @id @default(autoincrement())
+    name                          String   
+    id_last_user                  Int
+    last_modification_description String
+    last_modification_date        DateTime @updatedAt
+    isDeleted                     Boolean  @default(false)
+    user                          user     @relation(fields: [id_last_user], references: [id], map: "Sub_brand_id_last_user_fkey")
+    brandId                       Int
+    brand                         brand    @relation(fields: [brandId], references: [id], map: "Sub_brand_brandId_fkey")
+    productsubbrand               productsubbrand[]
+    @@index([id_last_user], map: "Sub_brand_id_last_user_fkey")
 }
 
 model color {
@@ -58,10 +73,22 @@ model product {
   brand                         brand       @relation(fields: [brandId], references: [id], map: "Product_brandId_fkey")
   user                          user        @relation(fields: [id_last_user], references: [id], map: "Product_id_last_user_fkey")
   productcolor                  productcolor[]
+  productsubbrand               productsubbrand[]
 
   @@index([accessoryId], map: "Product_accessoryId_fkey")
   @@index([brandId], map: "Product_brandId_fkey")
   @@index([id_last_user], map: "Product_id_last_user_fkey")
+}
+
+
+model productsubbrand{
+    productId                     Int
+    subbrandId                    Int
+    product                       product  @relation(fields: [productId], references: [id], map: "Product_sub_brand_productId_fkey")
+    subbrand                      subbrand @relation(fields: [subbrandId], references: [id], map: "Product_sub_brand_subbrandId_fkey")
+
+    @@id([productId, subbrandId])
+    @@index([productId], map: "Product_sub_brand_productId_fkey")
 }
 
 model productcolor {
@@ -102,6 +129,7 @@ model user {
   product           product[]
   refreshtoken      refreshtoken[]
   roles             userroles[]
+  subbrand          subbrand[]
 }
 
 model userroles {

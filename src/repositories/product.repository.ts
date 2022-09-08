@@ -22,17 +22,38 @@ const selectObject = {
 			},
 		},
 	},
+    productsubbrand: {
+        select: {
+            subbrand: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
+        }
+    },
 	id_last_user: true,
 	last_modification_description: true,
 	isDeleted: true,
 }
 
-async function createProduct(product: IProduct, accessoryId: number, brandId:number, colors: Array<number>, userId: number){
-
+async function createProduct(product: IProduct, accessoryId: number, brandId:number, colors: Array<number>, subBrands: Array<number>, userId: number){
     const checkProduct = await getProductBySKU(product.sku);
 
     if(checkProduct){
-        return await prisma.product.update({
+        const deletedColors = prisma.productcolor.deleteMany({
+            where: {
+                product_id: checkProduct.id
+            }
+        });
+    
+        const deletedSubBrands = prisma.productsubbrand.deleteMany({
+            where: {
+                productId: checkProduct.id
+            }
+        });
+
+        const updateProduct = prisma.product.update({
             where: {
                 id: checkProduct.id
             },
@@ -50,18 +71,27 @@ async function createProduct(product: IProduct, accessoryId: number, brandId:num
                         id: accessoryId
                     }
                 },
+                productsubbrand: {
+                    create: subBrands.map(subBrand => ({
+                        subbrandId: subBrand
+                    }))
+                },
                 productcolor: {
                     create: colors.map(color => ({
                         color_id: color
                     }))
                 },
+                
                 user: {
                     connect: {
                         id: userId
                     }
                 }
             }
+
         });
+
+        return await prisma.$transaction([deletedColors, deletedSubBrands, updateProduct]);
 
     }else{
         return await prisma.product.create({
@@ -83,6 +113,11 @@ async function createProduct(product: IProduct, accessoryId: number, brandId:num
                         color_id: color
                     }))
                 },
+                productsubbrand: {
+                    create: subBrands.map(subBrand => ({
+                        subbrandId: subBrand
+                    }))
+                },
                 user: {
                     connect: {
                         id: userId
@@ -93,10 +128,16 @@ async function createProduct(product: IProduct, accessoryId: number, brandId:num
     }
 }
 
-async function updateProduct(product: IProduct, productId: number, accessoryId: number, brandId:number, colors: Array<number>, userId: number){
+async function updateProduct(product: IProduct, productId: number, accessoryId: number, brandId:number, colors: Array<number>, subBrands: Array<number>, userId: number){
     const deletedColors = prisma.productcolor.deleteMany({
         where: {
             product_id: productId
+        }
+    });
+
+    const deletedSubBrands = prisma.productsubbrand.deleteMany({
+        where: {
+            productId: productId
         }
     });
 
@@ -122,6 +163,11 @@ async function updateProduct(product: IProduct, productId: number, accessoryId: 
                     color_id: color
                 }))
             },
+            productsubbrand: {
+                create: subBrands.map(subBrand => ({
+                    subbrandId: subBrand
+                }))
+            },
             user: {
                 connect: {
                     id: userId
@@ -131,9 +177,9 @@ async function updateProduct(product: IProduct, productId: number, accessoryId: 
         
     });
 
-    const transaction = await prisma.$transaction([deletedColors, updateP]);
+    const transaction = await prisma.$transaction([deletedColors, deletedSubBrands, updateP]);
 
-    return transaction[1];
+    return transaction[2];
 }
 
 async function deleteProduct(productId: number, userId: number){
