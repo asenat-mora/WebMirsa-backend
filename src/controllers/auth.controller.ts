@@ -1,32 +1,16 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { createUser, getUserByEmail, getUserById } from "../repositories/user.repository";
+import { getUserByEmail, getUserById } from "../repositories/user.repository";
 import validationMiddleware from "../middlewares/validation.middleware";
 import * as argon2 from "argon2";
-import { signUpSchema, loginSchema, logoutSchema} from "../models/user.model";
+import { loginSchema, logoutSchema} from "../models/user.model";
 import { generateJWTToken , generateRefreshToken } from "../services/jwt.service";
 import { deleteRefreshToken, getInfoByRefreshToken } from "../repositories/refresh-token.repository";
 import { insertRefreshToken } from "../repositories/refresh-token.repository";
-import { ILoginUser, IUser } from "../interfaces/user.interface";
+import { ILoginUser} from "../interfaces/user.interface";
 
 
 const router = Router();
 
-
-router.post("/signUp", validationMiddleware(signUpSchema, "body") , async (req: Request, res: Response, next: NextFunction) => {
-    const roles = req.body.roles as Array<number>; 
-    delete req.body.roles;
-    let userBody: IUser = req.body as IUser;
-
-    userBody.password = await argon2.hash(userBody.password);
-
-    try{
-        const user = await createUser(userBody, roles);
-        res.sendStatus(204);
-    }catch(error: any) {
-        next(error);
-    }
-
-});
 
 router.post("/login", validationMiddleware(loginSchema, "body") , async (req: Request, res: Response, next: NextFunction) => {
     const loginDetails = req.body as ILoginUser;

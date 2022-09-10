@@ -21,6 +21,7 @@ app.use(routes);
 const port = process.env.PORT || 3000;
 
 app.use((err: Error | Prisma.PrismaClientKnownRequestError, req: Request, res: Response, next: NextFunction) => {
+    console.log(err);
     // @ts-ignore
     if (err && err.meta) {
         // @ts-ignore

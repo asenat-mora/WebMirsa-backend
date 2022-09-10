@@ -10,6 +10,7 @@ const productSchema : Joi.Schema = Joi.object({
     side: Joi.string().required(),
     brandId: Joi.number().required(),
     accessoryId: Joi.number().required(),
+    subBrands: Joi.array().items(Joi.number()),
 });
 
 const queryProductSchema : Joi.Schema = Joi.object({
