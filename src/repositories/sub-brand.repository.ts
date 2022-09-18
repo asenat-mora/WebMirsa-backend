@@ -48,9 +48,16 @@ async function getAllSubBrands(){
             name: true,
             brandId: true,
             last_modification_description: true,
+            last_modification_date: true,
             user : {
                 select: {
-                    id: true,
+                    name: true,
+                    surname: true
+                }
+            },
+            brand: {
+                select: {
+                    name: true
                 }
             }
         }

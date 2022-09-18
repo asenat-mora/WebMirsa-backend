@@ -53,6 +53,10 @@ model color {
   id        Int         @id @default(autoincrement())
   name      String
   productcolor productcolor[]
+  id_last_user                  Int
+  last_modification_description String
+  last_modification_date        DateTime @updatedAt
+  user                          user     @relation(fields: [id_last_user], references: [id], map: "color_id_last_user_fkey")
 }
 
 model product {
@@ -130,6 +134,7 @@ model user {
   refreshtoken      refreshtoken[]
   roles             userroles[]
   subbrand          subbrand[]
+  color             color[]
 }
 
 model userroles {

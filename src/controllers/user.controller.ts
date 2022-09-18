@@ -10,7 +10,7 @@ import Roles from "../models/roles.model";
 
 const router = Router();
 
-router.post("/signUp", validationMiddleware(signUpSchema, "body") , jwtRolesMiddleware([Roles.Administrador]), async (req: Request, res: Response, next: NextFunction) => {
+router.post("/signUp", jwtRolesMiddleware([Roles.Administrador]) ,validationMiddleware(signUpSchema, "body") , async (req: Request, res: Response, next: NextFunction) => {
     const roles = req.body.roles as Array<number>; 
     delete req.body.roles;
     let userBody: IUser = req.body as IUser;

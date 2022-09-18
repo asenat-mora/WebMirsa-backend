@@ -7,6 +7,7 @@ import { generateJWTToken , generateRefreshToken } from "../services/jwt.service
 import { deleteRefreshToken, getInfoByRefreshToken } from "../repositories/refresh-token.repository";
 import { insertRefreshToken } from "../repositories/refresh-token.repository";
 import { ILoginUser} from "../interfaces/user.interface";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 
 const router = Router();
@@ -52,7 +53,12 @@ router.post("/logout", validationMiddleware(logoutSchema, "body"),async (req: Re
         await deleteRefreshToken(refreshToken);
         res.sendStatus(204);
     }catch(error){
-        next(error);
+        if(error  instanceof PrismaClientKnownRequestError){
+            res.sendStatus(204);
+        }else{
+            next(error);
+        }
+        
     }
 });
 
