@@ -1,4 +1,3 @@
-import { Multer } from "multer";
 import { v4 as uuid } from "uuid";
 import { bucket } from "../config/bucket.config"
 
