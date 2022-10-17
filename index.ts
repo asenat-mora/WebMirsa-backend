@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import routes from './src/routes/routes';
+import { MulterError } from 'multer';
 dotenv.config();
 
 const app: Express = express();
@@ -15,13 +16,16 @@ app.use(express.json());
 
 app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
-
 app.use(routes);
 
 const port = process.env.PORT || 3000;
 
-app.use((err: Error | Prisma.PrismaClientKnownRequestError, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error | Prisma.PrismaClientKnownRequestError | MulterError, req: Request, res: Response, next: NextFunction) => {
     console.log(err);
+    
+    if(err instanceof MulterError){
+        return res.status(400).json({message: err.message});
+    }
     // @ts-ignore
     if (err && err.meta) {
         // @ts-ignore

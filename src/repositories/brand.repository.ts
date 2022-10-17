@@ -94,9 +94,11 @@ async function getAllBrands() {
             name: true,
             key: true,
             last_modification_description: true,
+            last_modification_date: true,
             user: {
                 select: {
-                    id: true,
+                    name: true,
+                    surname: true
                 }
             }
         }
@@ -113,10 +115,12 @@ async function getBrandById(id: number) {
             name: true,
             key: true,
             last_modification_description: true,
+            last_modification_date: true,
             isDeleted: true,
             user: {
                 select: {
-                    id: true,
+                    name: true,
+                    surname: true
                 }
             }
         }

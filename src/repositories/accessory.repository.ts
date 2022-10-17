@@ -92,9 +92,11 @@ async function getAllAccessories(){
             id: true,
             name: true,
             last_modification_description: true,
+            last_modification_date: true,
             user: {
                 select: {
-                    id: true,
+                    name : true,
+                    surname: true
                 }
             }
         }
@@ -110,10 +112,12 @@ async function getAccessoryById(id: number){
             id: true,
             name: true,
             last_modification_description: true,
+            last_modification_date : true,
             isDeleted: true,
             user: {
                 select: {
-                    id: true,
+                    name : true,
+                    surname: true
                 }
             }
         }
@@ -135,6 +139,7 @@ async function getAccessoryByName(name: string){
             id: true,
             name: true,
             last_modification_description: true,
+            last_modification_date : true,
             isDeleted: true
         }
     });

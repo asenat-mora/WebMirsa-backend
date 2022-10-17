@@ -5,6 +5,7 @@ import jwtRolesMiddleware from "../middlewares/jwt-roles.middleware";
 import validationMiddleware from "../middlewares/validation.middleware";
 import { colorSchema } from "../models/color.model";
 import Roles from "../models/roles.model";
+import { CustomRequest } from "../interfaces/request.interface";
 
 
 const router = Router();
@@ -31,7 +32,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 router.post("/", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]) , validationMiddleware(colorSchema, "body") ,async(req: Request, res: Response, next: NextFunction) => {
     const color = req.body as IColor;
     try{
-        const result = await createColor(color);
+        const result = await createColor(color ,(req as CustomRequest).user!.userId);
         res.sendStatus(204);
     }catch(error){
         next(error);
@@ -41,7 +42,7 @@ router.post("/", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]) , v
 router.patch("/:id", jwtRolesMiddleware([Roles.Administrador, Roles.Capturista]) , validationMiddleware(colorSchema, "body") ,async(req: Request, res: Response, next: NextFunction) => {
     const color: IColorEdit = {name : req.body.name , id: Number(req.params.id)};
     try{
-        const result = await updateColor(color);
+        const result = await updateColor(color, (req as CustomRequest).user!.userId);
         res.status(200).json(result);
     }catch(error){
         next(error);
