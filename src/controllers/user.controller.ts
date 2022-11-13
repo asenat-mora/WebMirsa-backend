@@ -50,4 +50,15 @@ router.get("/", jwtRolesMiddleware([Roles.Administrador]), async(req: Request, r
     res.send(await getAllUsers());
 });
 
+router.delete("/:id", jwtRolesMiddleware([Roles.Administrador]) , async(req: Request, res: Response, next: NextFunction) => {
+    try{
+        const result = await deleteUser(Number(req.params.id));
+        res.sendStatus(204);
+    }catch(error){
+        next(error);
+    }
+});
+
+
+
 export default router;

@@ -103,3 +103,11 @@ export async function getUserByEmail(email: string){
     return user;
 }
 
+async function deleteUser(id: number) {
+    return await prisma.user.delete({
+        where: {
+            id
+        }
+    });
+}
+
