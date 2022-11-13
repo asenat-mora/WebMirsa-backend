@@ -48,6 +48,9 @@ export async function updateUser(user: IUser, roles: Array<number>, userId: numb
      
 export async function getAllUsers(){
     return await prisma.user.findMany({
+        where: {
+            isDeactivated: false
+        },
         select: {
             id: true,
             name: true,
