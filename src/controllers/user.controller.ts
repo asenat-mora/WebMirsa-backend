@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { getAllUsers, getUserById, updateUser } from "../repositories/user.repository";
+import { getAllUsers, getUserById, updateUser , deleteUser} from "../repositories/user.repository";
 import validationMiddleware from "../middlewares/validation.middleware";
 import { editUserSchema, signUpSchema} from "../models/user.model";
 import * as argon2 from "argon2";

@@ -24,6 +24,11 @@ router.post("/login", validationMiddleware(loginSchema, "body") , async (req: Re
                 message: "User with email "+ loginDetails.email +" not found"
             });
         }
+        else if(user.isDeactivated){
+            res.status(401).json({
+                message: "User with email "+ loginDetails.email +" is deactivated"
+            });
+        }
         else{
             if(await argon2.verify(user.password, loginDetails.password)){
                 const jwttoken = await generateJWTToken({userId: user.id, roles: user.roles.map(role => role.roleId)});

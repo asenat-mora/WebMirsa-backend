@@ -93,6 +93,7 @@ export async function getUserByEmail(email: string){
             email: true,
             surname: true,
             password: true,
+            isDeactivated: true,
             roles: {
                 select: {
                     roleId: true,
@@ -103,11 +104,13 @@ export async function getUserByEmail(email: string){
     return user;
 }
 
-async function deleteUser(id: number) {
-    return await prisma.user.delete({
+export async function deleteUser(id: number) {
+    return await prisma.user.update({
         where: {
-            id
+            id: id
+        },
+        data: {
+            isDeactivated: true
         }
     });
 }
-
