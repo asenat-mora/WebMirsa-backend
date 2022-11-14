@@ -48,6 +48,9 @@ export async function updateUser(user: IUser, roles: Array<number>, userId: numb
      
 export async function getAllUsers(){
     return await prisma.user.findMany({
+        where: {
+            isDeactivated: false
+        },
         select: {
             id: true,
             name: true,
@@ -93,6 +96,7 @@ export async function getUserByEmail(email: string){
             email: true,
             surname: true,
             password: true,
+            isDeactivated: true,
             roles: {
                 select: {
                     roleId: true,
@@ -103,3 +107,13 @@ export async function getUserByEmail(email: string){
     return user;
 }
 
+export async function deleteUser(id: number) {
+    return await prisma.user.update({
+        where: {
+            id: id
+        },
+        data: {
+            isDeactivated: true
+        }
+    });
+}

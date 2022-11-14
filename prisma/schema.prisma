@@ -128,6 +128,7 @@ model user {
   email             String         @unique(map: "User_email_key")
   verificationEmail String
   password          String
+  isDeactivated     Boolean        @default(false)
   accessory         accessory[]
   brand             brand[]
   product           product[]
@@ -135,6 +136,7 @@ model user {
   roles             userroles[]
   subbrand          subbrand[]
   color             color[]
+
 }
 
 model userroles {

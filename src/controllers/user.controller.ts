@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { getAllUsers, getUserById, updateUser } from "../repositories/user.repository";
+import { getAllUsers, getUserById, updateUser , deleteUser} from "../repositories/user.repository";
 import validationMiddleware from "../middlewares/validation.middleware";
 import { editUserSchema, signUpSchema} from "../models/user.model";
 import * as argon2 from "argon2";
@@ -49,5 +49,16 @@ router.get("/:id", jwtRolesMiddleware([Roles.Administrador]), async(req: Request
 router.get("/", jwtRolesMiddleware([Roles.Administrador]), async(req: Request, res: Response, next: NextFunction) => {
     res.send(await getAllUsers());
 });
+
+router.delete("/:id", jwtRolesMiddleware([Roles.Administrador]) , async(req: Request, res: Response, next: NextFunction) => {
+    try{
+        const result = await deleteUser(Number(req.params.id));
+        res.sendStatus(204);
+    }catch(error){
+        next(error);
+    }
+});
+
+
 
 export default router;
